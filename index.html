@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale – Transporte de Minério</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Animations */
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Hide scrollbar for clean UI in the slide content */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Transição suave para o container do slide */
+        #slide-container {
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans overflow-hidden">
+
+    <!-- Estrutura Principal do App -->
+    <div class="flex flex-col w-full h-screen" id="app-container">
+        
+        <!-- Área de Apresentação -->
+        <div class="flex-grow flex items-center justify-center p-2 md:p-4 relative bg-slate-100">
+            <div id="slide-container" class="w-full max-w-[1400px] aspect-video rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-500 ease-in-out">
+                
+                <!-- Barra decorativa superior -->
+                <div id="decorative-bar" class="h-2 w-full bg-gradient-to-r from-[#005F52] via-emerald-500 to-[#FFB612] hidden"></div>
+
+                <!-- Conteúdo do Slide -->
+                <div id="slide-content" class="flex-grow flex flex-col p-8 md:p-14 overflow-y-auto hide-scrollbar animate-fade-in">
+                    <!-- Injetado via JavaScript -->
+                </div>
+                
+                <!-- Barra de Progresso -->
+                <div class="h-1.5 w-full bg-emerald-900/20">
+                    <div id="progress-bar" class="h-full bg-[#FFB612] transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de Navegação -->
+        <div class="h-20 bg-white border-t border-gray-200 flex items-center px-6 md:px-12 shadow-inner z-10">
+            
+            <div class="flex-1 flex justify-start">
+                <button id="prev-btn" class="flex items-center px-4 py-2 rounded-lg font-medium transition-colors text-gray-300 cursor-not-allowed" disabled>
+                    <i data-lucide="chevron-left" class="w-5 h-5 mr-1"></i> Anterior
+                </button>
+            </div>
+
+            <!-- Pontos de Navegação (Dots) -->
+            <div id="dots-container" class="flex space-x-2">
+                <!-- Injetado via JavaScript -->
+            </div>
+
+            <div class="flex-1 flex justify-end items-center space-x-2 md:space-x-4">
+                <button id="next-btn" class="flex items-center px-4 py-2 rounded-lg font-medium transition-colors text-[#005F52] hover:bg-emerald-50">
+                    Próximo <i data-lucide="chevron-right" class="w-5 h-5 ml-1"></i>
+                </button>
+                
+                <!-- Botão de Tela Cheia -->
+                <button id="fullscreen-btn" class="p-2 text-gray-500 hover:text-[#005F52] hover:bg-emerald-50 rounded-lg transition-colors" title="Tela Cheia">
+                    <i id="fs-icon" data-lucide="maximize" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Lógica JavaScript -->
+    <script>
+        // Dados dos Slides (ícones corrigidos)
+        const slides = [
+            {
+                id: 1,
+                type: 'title',
+                title: 'Vale – Transporte de Minério',
+                subtitle: 'Soluções Logísticas para Aumentar a Eficiência das Exportações',
+                content: `
+                    <div class="mt-12 pt-8 border-t border-emerald-700/50 text-emerald-100 flex flex-col items-center">
+                        <i data-lucide="school" class="w-8 h-8 mb-3 text-yellow-400"></i>
+                        <p class="font-bold text-lg tracking-wide">EEB São José</p>
+                        <p class="text-emerald-200 mt-2 font-light">
+                            Alunos: Crystyan, Antony Cardosso, Gabriel Biagentini e Vini Crai
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                type: 'content',
+                title: 'Introdução',
+                icon: `<i data-lucide="globe" class="w-12 h-12 text-emerald-600 mb-4"></i>`,
+                content: `
+                    <div class="space-y-6 text-lg text-gray-700">
+                        <p class="font-semibold text-gray-800 text-2xl mb-4">A Importância da Vale para a Economia</p>
+                        <p>A Vale é um pilar estrutural da economia brasileira, figurando entre as maiores produtoras globais de minério de ferro. Este mineral é um ativo essencial para as exportações do país, sendo fundamental para a geração de riqueza.</p>
+                        <div class="bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-lg shadow-sm mt-6">
+                            <p class="font-bold text-emerald-800 mb-2 flex items-center">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 mr-2 text-emerald-600"></i> 
+                                O Grande Desafio
+                            </p>
+                            <p class="text-gray-700">
+                                Transportar milhões de toneladas anuais das minas no interior do país até os portos na costa impõe desafios logísticos monumentais. Vencer essas distâncias exige uma infraestrutura de escala e eficiência mundiais.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                type: 'content',
+                title: 'O Problema',
+                icon: `<i data-lucide="alert-triangle" class="w-12 h-12 text-yellow-500 mb-4"></i>`,
+                content: `
+                    <div class="space-y-6">
+                        <p class="text-xl text-gray-600 mb-6">Impactos de um sistema de transporte ineficiente:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg">
+                            <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex items-start">
+                                <i data-lucide="clock" class="w-8 h-8 text-red-500 mr-4 flex-shrink-0"></i>
+                                <div>
+                                    <p class="font-bold text-red-800 mb-1">Atrasos nas Exportações</p>
+                                    <p class="text-gray-700 text-base">Gargalos atrasam o embarque nos portos.</p>
+                                </div>
+                            </div>
+                            <div class="bg-orange-50 p-6 rounded-xl border border-orange-100 flex items-start">
+                                <i data-lucide="coins" class="w-8 h-8 text-orange-500 mr-4 flex-shrink-0"></i>
+                                <div>
+                                    <p class="font-bold text-orange-800 mb-1">Custos Operacionais</p>
+                                    <p class="text-gray-700 text-base">Manutenções e desgastes elevam o custo por viagem.</p>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 flex items-start">
+                                <i data-lucide="arrow-down" class="w-8 h-8 text-blue-500 mr-4 flex-shrink-0"></i>
+                                <div>
+                                    <p class="font-bold text-blue-800 mb-1">Menor Competitividade</p>
+                                    <p class="text-gray-700 text-base">Incapacidade de atender prazos internacionais.</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex items-start">
+                                <i data-lucide="arrow-down" class="w-8 h-8 text-slate-500 mr-4 flex-shrink-0"></i>
+                                <div>
+                                    <p class="font-bold text-slate-800 mb-1">Perdas Financeiras</p>
+                                    <p class="text-gray-700 text-base">Impacto direto no faturamento e na economia.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                type: 'split',
+                title: 'Solução: Ferrovias',
+                icon: `<i data-lucide="train" class="w-10 h-10 text-emerald-700"></i>`,
+                content: `
+                    <div class="w-full">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Melhorias na Malha Ferroviária</h3>
+                        <ul class="space-y-6 text-lg text-gray-700">
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Ampliação da frota:</strong> Aquisição de novos trens e vagões de alta capacidade.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Modernização:</strong> Atualização tecnológica e estrutural das linhas férreas.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Novas conexões:</strong> Construção de ramais interligando as minas aos portos.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Tecnologia:</strong> Uso de sistemas inteligentes para monitoramento e segurança.</span>
+                            </li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                type: 'split',
+                title: 'Solução: Transporte Marítimo',
+                icon: `<i data-lucide="ship" class="w-10 h-10 text-blue-600"></i>`,
+                content: `
+                    <div class="w-full">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Melhorias Portuárias e Navais</h3>
+                        <ul class="space-y-6 text-lg text-gray-700">
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-blue-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Navios gigantes:</strong> Utilização de frota de grande porte para maximizar o volume (ex: Valemax).</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-blue-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Expansão de portos:</strong> Aprofundamento e modernização dos terminais.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-blue-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Automação:</strong> Sistemas automatizados de carregamento e descarregamento rápido.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-blue-500 mr-3 mt-1 flex-shrink-0"></i>
+                                <span><strong>Redução de tempo:</strong> Otimização logística para minimizar a espera dos navios.</span>
+                            </li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                type: 'content',
+                title: 'Vantagens das Soluções',
+                icon: `<i data-lucide="arrow-up" class="w-12 h-12 text-emerald-600 mb-4"></i>`,
+                content: `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500 text-center flex flex-col items-center">
+                            <i data-lucide="coins" class="w-10 h-10 text-yellow-500 mb-3"></i>
+                            <h4 class="font-bold text-gray-800 mb-2">Menor Custo</h4>
+                            <p class="text-gray-600 text-sm">Redução do custo por tonelada transportada.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500 text-center flex flex-col items-center">
+                            <i data-lucide="train" class="w-10 h-10 text-yellow-500 mb-3"></i>
+                            <h4 class="font-bold text-gray-800 mb-2">Maior Capacidade</h4>
+                            <p class="text-gray-600 text-sm">Gigantesca movimentação de carga simultânea.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500 text-center flex flex-col items-center">
+                            <i data-lucide="leaf" class="w-10 h-10 text-yellow-500 mb-3"></i>
+                            <h4 class="font-bold text-gray-800 mb-2">Sustentabilidade</h4>
+                            <p class="text-gray-600 text-sm">Redução do impacto ambiental comparado ao modal rodoviário.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500 text-center flex flex-col items-center sm:col-span-2 lg:col-span-1">
+                            <i data-lucide="settings" class="w-10 h-10 text-yellow-500 mb-3"></i>
+                            <h4 class="font-bold text-gray-800 mb-2">Eficiência</h4>
+                            <p class="text-gray-600 text-sm">Integração perfeita da cadeia logística.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500 text-center flex flex-col items-center sm:col-span-2 lg:col-span-2">
+                            <i data-lucide="globe" class="w-10 h-10 text-yellow-500 mb-3"></i>
+                            <h4 class="font-bold text-gray-800 mb-2">Aumento das Exportações</h4>
+                            <p class="text-gray-600 text-sm">Capacidade de atender melhor e mais rápido o exigente mercado internacional.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                type: 'content',
+                title: 'Justificativa',
+                icon: `<i data-lucide="anchor" class="w-12 h-12 text-slate-700 mb-4"></i>`,
+                content: `
+                    <div class="flex flex-col justify-center h-full space-y-6">
+                        <h3 class="text-3xl font-bold text-gray-800 text-center mb-4">A Integração Estratégica</h3>
+                        <div class="bg-gradient-to-r from-emerald-100 to-blue-100 p-8 rounded-2xl shadow-sm text-center">
+                            <p class="text-xl leading-relaxed text-gray-800 font-medium">
+                                "A integração exclusiva entre ferrovias pesadas e navios de grande porte é a <strong>única alternativa viável</strong> para o transporte de minério em larga escala."
+                            </p>
+                        </div>
+                        <p class="text-lg text-gray-600 text-center max-w-3xl mx-auto mt-4">
+                            O modal rodoviário não comporta o volume extraído. O sistema multimodal (Ferrovia + Navio) adotado assegura um fluxo contínuo, seguro e com o menor impacto ecológico e financeiro possível.
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                type: 'conclusion',
+                title: 'Conclusão',
+                icon: `<i data-lucide="bar-chart-3" class="w-16 h-16 text-yellow-400 mb-6"></i>`,
+                content: `
+                    <div class="text-center space-y-8 w-full max-w-4xl mx-auto">
+                        <p class="text-2xl text-white font-light leading-relaxed">
+                            Os investimentos em infraestrutura logística formam a <strong>espinha dorsal</strong> da Vale.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                            <div class="bg-emerald-800 bg-opacity-60 p-6 rounded-xl border border-emerald-600">
+                                <h4 class="font-bold text-yellow-400 text-xl mb-2">Produtividade</h4>
+                                <p class="text-emerald-50">Otimização de tempo e recursos em toda a cadeia.</p>
+                            </div>
+                            <div class="bg-emerald-800 bg-opacity-60 p-6 rounded-xl border border-emerald-600">
+                                <h4 class="font-bold text-yellow-400 text-xl mb-2">Competitividade</h4>
+                                <p class="text-emerald-50">Liderança consolidada no mercado global de minérios.</p>
+                            </div>
+                            <div class="bg-emerald-800 bg-opacity-60 p-6 rounded-xl border border-emerald-600">
+                                <h4 class="font-bold text-yellow-400 text-xl mb-2">Crescimento</h4>
+                                <p class="text-emerald-50">Motor primordial para a economia e exportações do país.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentSlide = 0;
+
+        // Elementos do DOM
+        const slideContainer = document.getElementById('slide-container');
+        const decorativeBar = document.getElementById('decorative-bar');
+        const slideContent = document.getElementById('slide-content');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const dotsContainer = document.getElementById('dots-container');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const fsIcon = document.getElementById('fs-icon');
+
+        // Função de Renderização
+        function renderSlide(index) {
+            const slide = slides[index];
+            if (!slide) return;
+
+            // Forçar reinício da animação
+            slideContent.classList.remove('animate-fade-in');
+            void slideContent.offsetWidth;
+            slideContent.classList.add('animate-fade-in');
+
+            // Troca de Estilos Baseada no Tipo de Slide
+            if (slide.type === 'title' || slide.type === 'conclusion') {
+                slideContainer.className = "w-full max-w-[1400px] aspect-video rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-500 ease-in-out bg-[#005F52] text-white";
+                decorativeBar.classList.add('hidden');
+            } else {
+                slideContainer.className = "w-full max-w-[1400px] aspect-video rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-500 ease-in-out bg-white text-gray-800";
+                decorativeBar.classList.remove('hidden');
+            }
+
+            // Injetar Estrutura Interna HTML
+            let innerHTML = '';
+            
+            if (slide.type === 'title') {
+                innerHTML = `
+                    <div class="flex-grow flex flex-col items-center justify-center text-center space-y-6">
+                        <div class="w-24 h-2 bg-[#FFB612] mb-6 rounded-full"></div>
+                        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight">${slide.title}</h1>
+                        <p class="text-xl md:text-2xl text-emerald-100 font-light max-w-3xl">${slide.subtitle}</p>
+                        ${slide.content}
+                    </div>
+                `;
+            } else if (slide.type === 'content') {
+                innerHTML = `
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center mb-6 pb-4 border-b border-gray-100">
+                            ${slide.icon}
+                            <h2 class="text-4xl font-bold text-[#005F52] ml-4">${slide.title}</h2>
+                        </div>
+                        <div class="flex-grow flex flex-col justify-center">
+                            ${slide.content}
+                        </div>
+                    </div>
+                `;
+            } else if (slide.type === 'split') {
+                innerHTML = `
+                    <div class="flex flex-col h-full">
+                        <div class="flex items-center mb-6 pb-2">
+                            ${slide.icon}
+                            <h2 class="text-4xl font-bold text-gray-800 ml-4">${slide.title}</h2>
+                        </div>
+                        <div class="flex-grow flex items-center bg-gray-50 rounded-xl p-8 border border-gray-100 shadow-inner">
+                            ${slide.content}
+                        </div>
+                    </div>
+                `;
+            } else if (slide.type === 'conclusion') {
+                innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full">
+                        ${slide.icon}
+                        <h2 class="text-5xl font-bold text-white mb-10 tracking-wide">${slide.title}</h2>
+                        ${slide.content}
+                    </div>
+                `;
+            }
+
+            slideContent.innerHTML = innerHTML;
+
+            // Atualizar Progresso
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Atualizar Botões
+            updateButtons();
+            
+            // Renderizar Pontos de Navegação (Dots)
+            renderDots();
+
+            // Renderizar ícones do Lucide no HTML injetado
+            lucide.createIcons();
+        }
+
+        // Função para atualizar estado dos botões
+        function updateButtons() {
+            prevBtn.disabled = currentSlide === 0;
+            prevBtn.className = currentSlide === 0 
+                ? "flex items-center px-4 py-2 rounded-lg font-medium transition-colors text-gray-300 cursor-not-allowed"
+                : "flex items-center px-4 py-2 rounded-lg font-medium transition-colors text-[#005F52] hover:bg-emerald-50";
+
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            nextBtn.className = currentSlide === slides.length - 1 
+                ? "flex items-center px-4 py-2 rounded-lg font-medium transition-colors text-gray-300 cursor-not-allowed"
+                : "flex items-center px-4 py-2 rounded-lg font-medium transition-colors text-[#005F52] hover:bg-emerald-50";
+        }
+
+        // Função para Renderizar os Dots de Navegação
+        function renderDots() {
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, idx) => {
+                const dot = document.createElement('button');
+                dot.onclick = () => goToSlide(idx);
+                dot.setAttribute('aria-label', `Ir para o slide ${idx + 1}`);
+                dot.className = `w-3 h-3 rounded-full transition-colors ${
+                    currentSlide === idx ? 'bg-[#005F52]' : 'bg-gray-300 hover:bg-gray-400'
+                }`;
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // Funções de Navegação (globais para onclick funcionar)
+        window.nextSlide = function() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                renderSlide(currentSlide);
+            }
+        };
+
+        window.prevSlide = function() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderSlide(currentSlide);
+            }
+        };
+
+        window.goToSlide = function(index) {
+            if (index >= 0 && index < slides.length) {
+                currentSlide = index;
+                renderSlide(currentSlide);
+            }
+        };
+
+        // Controle de Tela Cheia
+        window.toggleFullScreen = function() {
+            const appContainer = document.documentElement;
+            
+            if (!document.fullscreenElement) {
+                appContainer.requestFullscreen().catch(err => {
+                    console.log('Erro ao tentar entrar em tela cheia: ' + err.message);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        };
+
+        // Atualizar ícone de tela cheia quando o estado mudar
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fsIcon.setAttribute('data-lucide', 'minimize');
+            } else {
+                fsIcon.setAttribute('data-lucide', 'maximize');
+            }
+            lucide.createIcons();
+        });
+
+        // Event listeners para os botões
+        prevBtn.addEventListener('click', window.prevSlide);
+        nextBtn.addEventListener('click', window.nextSlide);
+        fullscreenBtn.addEventListener('click', window.toggleFullScreen);
+
+        // Navegação pelo Teclado (Setas)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                window.nextSlide();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                window.prevSlide();
+            }
+        });
+
+        // Iniciar apresentação no primeiro slide
+        renderSlide(currentSlide);
+    </script>
+</body>
+</html>
